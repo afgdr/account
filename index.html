@@ -3,170 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Проверка на бота</title>
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    <title>Мой сайт</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             text-align: center;
         }
-        .checking-section {
+        .container {
+            background: rgba(255,255,255,0.1);
+            padding: 40px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        h1 {
+            font-size: 2.5em;
             margin-bottom: 20px;
         }
-        .success-section {
-            display: none;
-            color: green;
-            font-size: 24px;
-            font-weight: bold;
-            margin-top: 20px;
-        }
-        .error-section {
-            display: none;
-            color: red;
-            font-size: 18px;
-            margin-top: 20px;
-        }
-        .loading {
-            display: none;
-            margin: 20px 0;
-        }
-        button {
-            background: #007cba;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            margin-top: 15px;
-        }
-        button:hover {
-            background: #005a87;
-        }
-        button:disabled {
-            background: #cccccc;
-            cursor: not-allowed;
+        .status {
+            background: #28a745;
+            padding: 10px 20px;
+            border-radius: 25px;
+            display: inline-block;
+            margin: 10px 0;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Проверка безопасности</h1>
+        <div class="status">✅ Сайт работает!</div>
+        <h1>🚀 Привет, мир!</h1>
+        <p>Ваш сайт на GitHub Pages + Cloudflare успешно запущен!</p>
+        <p>Теперь вы защищены от ботов 🤖</p>
         
-        <div class="checking-section">
-            <p>Пожалуйста, подтвердите что вы не бот</p>
-            <div id="turnstile-widget"></div>
-            <div class="loading" id="loading">
-                Проверка...
-            </div>
-            <button onclick="verifyHuman()" id="verify-btn" disabled>
-                Пройти проверку
-            </button>
-        </div>
-
-        <div class="success-section" id="success-section">
-            ✅ Проверка пройдена!<br>
-            <h2>Привет, мир!</h2>
-            <p>Добро пожаловать на наш сайт!</p>
-        </div>
-
-        <div class="error-section" id="error-section">
-            ❌ Проверка не пройдена. Пожалуйста, попробуйте снова.
+        <div style="margin-top: 30px; font-size: 0.9em; opacity: 0.8;">
+            <p>Обновлено: <span id="date"></span></p>
         </div>
     </div>
 
     <script>
-        let turnstileWidget;
-        
-        // Инициализация Turnstile после загрузки страницы
-        function initTurnstile() {
-            turnstileWidget = turnstile.render('#turnstile-widget', {
-                sitekey: '1x00000000000000000000AA', // Замените на ваш реальный ключ
-                theme: 'light',
-                callback: function(token) {
-                    document.getElementById('verify-btn').disabled = false;
-                },
-                'expired-callback': function() {
-                    document.getElementById('verify-btn').disabled = true;
-                },
-                'error-callback': function() {
-                    document.getElementById('verify-btn').disabled = true;
-                }
-            });
-        }
-
-        // Функция проверки
-        async function verifyHuman() {
-            const loading = document.getElementById('loading');
-            const verifyBtn = document.getElementById('verify-btn');
-            const successSection = document.getElementById('success-section');
-            const errorSection = document.getElementById('error-section');
-            const checkingSection = document.querySelector('.checking-section');
-
-            // Показываем загрузку
-            loading.style.display = 'block';
-            verifyBtn.disabled = true;
-
-            try {
-                // Получаем токен из Turnstile
-                const token = turnstile.getResponse(turnstileWidget);
-                
-                if (!token) {
-                    throw new Error('Токен не получен');
-                }
-
-                // Отправляем токен на сервер для проверки
-                const response = await fetch('/verify.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ token: token })
-                });
-
-                const result = await response.json();
-
-                if (result.success) {
-                    // Показываем успешный результат
-                    checkingSection.style.display = 'none';
-                    successSection.style.display = 'block';
-                } else {
-                    throw new Error('Серверная проверка не пройдена');
-                }
-
-            } catch (error) {
-                console.error('Ошибка проверки:', error);
-                checkingSection.style.display = 'none';
-                errorSection.style.display = 'block';
-                
-                // Показываем кнопку для повторной попытки
-                const retryBtn = document.createElement('button');
-                retryBtn.textContent = 'Попробовать снова';
-                retryBtn.onclick = function() {
-                    location.reload();
-                };
-                errorSection.appendChild(retryBtn);
-            } finally {
-                loading.style.display = 'none';
-            }
-        }
-
-        // Инициализируем Turnstile когда скрипт загрузится
-        if (typeof turnstile !== 'undefined') {
-            initTurnstile();
-        } else {
-            window.onload = initTurnstile;
-        }
+        document.getElementById('date').textContent = new Date().toLocaleString();
+        console.log('🌐 Сайт загружен через Cloudflare');
     </script>
 </body>
 </html>
