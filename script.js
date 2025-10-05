@@ -1,7 +1,7 @@
 class DiscordWebhookApp {
     constructor() {
         // URL бэкенда - замените на ваш реальный URL после деплоя
-        this.backendUrl = 'https://discord-webhook-backend.YOUR_SUBDOMAIN.workers.dev';
+        this.backendUrl = 'delta-exploits.elektroclesh.workers.dev/';
         
         // Элементы DOM
         this.form = document.getElementById('discordForm');
