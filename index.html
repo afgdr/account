@@ -10,8 +10,6 @@
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
-            background: #1a1a1a;
-            color: #333;
         }
 
         #verification-container {
@@ -20,7 +18,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            background: #808080; /* Серый фон */
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -30,16 +28,6 @@
 
         .verification-content {
             text-align: center;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 40px;
-            border-radius: 10px;
-            backdrop-filter: blur(10px);
-        }
-
-        .verification-text {
-            color: white;
-            font-size: 18px;
-            margin-bottom: 20px;
         }
 
         #main-content {
@@ -55,15 +43,13 @@
 
         .cf-turnstile {
             transform: scale(1.2);
-            margin: 20px 0;
         }
     </style>
 </head>
 <body>
     <div id="verification-container">
         <div class="verification-content">
-            <div class="verification-text">Проверка безопасности</div>
-            <!-- Замените YOUR_SITE_KEY на реальный ключ -->
+            <!-- Cloudflare Turnstile без текста -->
             <div class="cf-turnstile" 
                  data-sitekey="0x4AAAAAAB48k-3msrsccfDB" 
                  data-callback="onVerify"
@@ -76,27 +62,21 @@
     <div id="main-content"></div>
 
     <script>
-        // Callback при успешной проверке
         function onVerify(token) {
             console.log('Turnstile verification successful:', token);
-            
-            // Отправляем токен на сервер для проверки
             verifyWithServer(token);
         }
 
-        // Callback при ошибке
         function onError() {
             console.error('Turnstile error');
-            showError('Ошибка проверки. Пожалуйста, обновите страницу.');
+            location.reload();
         }
 
-        // Callback при таймауте
         function onTimeout() {
             console.warn('Turnstile timeout');
-            showError('Время проверки истекло. Пожалуйста, попробуйте снова.');
+            location.reload();
         }
 
-        // Функция для отправки токена на сервер
         async function verifyWithServer(token) {
             try {
                 const response = await fetch('/verify-turnstile', {
@@ -112,11 +92,10 @@
                 if (result.success) {
                     showMainContent();
                 } else {
-                    showError('Проверка не пройдена');
+                    location.reload();
                 }
             } catch (error) {
                 console.error('Server verification error:', error);
-                // В демо-режиме показываем контент даже без сервера
                 showMainContent();
             }
         }
@@ -134,23 +113,6 @@
             }, 500);
         }
 
-        function showError(message) {
-            document.querySelector('.verification-content').innerHTML = `
-                <div style="color: white; text-align: center;">
-                    <div style="font-size: 18px; margin-bottom: 20px;">${message}</div>
-                    <button onclick="location.reload()" style="
-                        background: white; 
-                        border: none; 
-                        padding: 10px 20px; 
-                        border-radius: 5px; 
-                        cursor: pointer;">
-                        Обновить страницу
-                    </button>
-                </div>
-            `;
-        }
-
-        // Автоматический таймаут на случай проблем с загрузкой Turnstile
         setTimeout(() => {
             if (document.getElementById('verification-container').style.display !== 'none') {
                 console.log('Turnstile loading timeout');
