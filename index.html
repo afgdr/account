@@ -1,57 +1,31 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Мой сайт</title>
     <style>
         body {
+            background: #666;
             margin: 0;
-            padding: 0;
             height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-family: Arial, sans-serif;
-            background: #666; /* Серый фон для проверки */
-        }
-        #verification {
-            text-align: center;
-            padding: 2rem;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
         }
     </style>
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 <body>
-    <div id="verification">
-        <h2>Проверка безопасности</h2>
-        <p>Подтвердите, что вы не робот</p>
-        <div class="cf-turnstile" data-sitekey="0x4AAAAAAB48k-3msrsccfDB" data-callback="onSuccess"></div>
-    </div>
+    <div class="cf-turnstile" data-sitekey="ВАШ_SITE_KEY" data-callback="onSuccess"></div>
 
     <script>
         function onSuccess() {
-            // Меняем фон на черный и убираем проверку
             document.body.style.background = '#000';
             document.body.innerHTML = '';
-            
-            // Сохраняем в localStorage
             localStorage.setItem('cf_verified', 'true');
-            localStorage.setItem('verify_time', Date.now());
         }
 
-        // Проверяем, был ли пользователь уже верифицирован
         if (localStorage.getItem('cf_verified')) {
-            const verifyTime = localStorage.getItem('verify_time');
-            const currentTime = Date.now();
-            const hoursPassed = (currentTime - verifyTime) / (1000 * 60 * 60);
-            
-            // Если прошло меньше 24 часов, сразу черный фон
-            if (hoursPassed < 24) {
-                document.body.style.background = '#000';
-                document.body.innerHTML = '';
-            }
+            document.body.style.background = '#000';
+            document.body.innerHTML = '';
         }
     </script>
 </body>
