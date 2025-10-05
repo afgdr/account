@@ -1,57 +1,58 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Мой сайт</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
             display: flex;
-            align-items: center;
             justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            background: #666; /* Серый фон для проверки */
+        }
+        #verification {
             text-align: center;
-        }
-        .container {
-            background: rgba(255,255,255,0.1);
-            padding: 40px;
-            border-radius: 15px;
-            backdrop-filter: blur(10px);
-        }
-        h1 {
-            font-size: 2.5em;
-            margin-bottom: 20px;
-        }
-        .status {
-            background: #28a745;
-            padding: 10px 20px;
-            border-radius: 25px;
-            display: inline-block;
-            margin: 10px 0;
+            padding: 2rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
         }
     </style>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 <body>
-    <div class="container">
-        <div class="status">✅ Сайт работает!</div>
-        <h1>🚀 Привет, мир!</h1>
-        <p>Ваш сайт на GitHub Pages + Cloudflare успешно запущен!</p>
-        <p>Теперь вы защищены от ботов 🤖</p>
-        
-        <div style="margin-top: 30px; font-size: 0.9em; opacity: 0.8;">
-            <p>Обновлено: <span id="date"></span></p>
-        </div>
+    <div id="verification">
+        <h2>Проверка безопасности</h2>
+        <p>Подтвердите, что вы не робот</p>
+        <div class="cf-turnstile" data-sitekey="0x4AAAAAAB48k-3msrsccfDB" data-callback="onSuccess"></div>
     </div>
 
     <script>
-        document.getElementById('date').textContent = new Date().toLocaleString();
-        console.log('🌐 Сайт загружен через Cloudflare');
+        function onSuccess() {
+            // Меняем фон на черный и убираем проверку
+            document.body.style.background = '#000';
+            document.body.innerHTML = '';
+            
+            // Сохраняем в localStorage
+            localStorage.setItem('cf_verified', 'true');
+            localStorage.setItem('verify_time', Date.now());
+        }
+
+        // Проверяем, был ли пользователь уже верифицирован
+        if (localStorage.getItem('cf_verified')) {
+            const verifyTime = localStorage.getItem('verify_time');
+            const currentTime = Date.now();
+            const hoursPassed = (currentTime - verifyTime) / (1000 * 60 * 60);
+            
+            // Если прошло меньше 24 часов, сразу черный фон
+            if (hoursPassed < 24) {
+                document.body.style.background = '#000';
+                document.body.innerHTML = '';
+            }
+        }
     </script>
 </body>
 </html>
