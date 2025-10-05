@@ -1,101 +1,34 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Discord Webhook Sender</title>
+    <title>Discord Sender</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>💬 Discord Webhook Sender</h1>
-            <p>Отправляйте сообщения в любой Discord канал через вебхук</p>
-        </header>
+        <h1>💬 Отправка в Discord</h1>
         
-        <main class="main-content">
-            <div class="card">
-                <form id="discordForm" class="message-form">
-                    <div class="form-group">
-                        <label for="webhookUrl">URL вебхука Discord: *</label>
-                        <input 
-                            type="url" 
-                            id="webhookUrl" 
-                            placeholder="https://discord.com/api/webhooks/123456/abc123..."
-                            required
-                            pattern="https://discord\.com/api/webhooks/.*"
-                        >
-                        <div class="input-help">
-                            Как получить вебхук: Настройки сервера → Интеграции → Вебхуки → Новый вебхук
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="username">Имя бота (опционально):</label>
-                        <input 
-                            type="text" 
-                            id="username" 
-                            placeholder="Мой Бот"
-                            maxlength="80"
-                        >
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="message">Сообщение: *</label>
-                        <textarea 
-                            id="message" 
-                            placeholder="Введите ваше сообщение здесь..." 
-                            required 
-                            rows="6"
-                            maxlength="2000"
-                        ></textarea>
-                        <div class="char-counter">
-                            <span id="charCount">0</span>/2000 символов
-                        </div>
-                    </div>
-                    
-                    <button type="submit" id="sendBtn" class="submit-btn">
-                        <span class="btn-text">📨 Отправить сообщение</span>
-                        <span class="btn-loading" style="display: none;">
-                            <div class="spinner"></div>
-                            Отправка...
-                        </span>
-                    </button>
-                </form>
-                
-                <div id="result" class="result-message" style="display: none;"></div>
+        <form id="myForm">
+            <div class="input-group">
+                <label>Webhook URL:</label>
+                <input type="text" id="webhook" placeholder="https://discord.com/api/webhooks/..." required>
             </div>
             
-            <div class="info-card">
-                <h3>ℹ️ Как использовать:</h3>
-                <ol>
-                    <li><strong>Получите URL вебхука</strong> в настройках Discord сервера</li>
-                    <li>Вставьте URL вебхука в поле выше</li>
-                    <li>Введите сообщение и имя бота (если нужно)</li>
-                    <li>Нажмите "Отправить сообщение"</li>
-                </ol>
-                
-                <div class="webhook-guide">
-                    <h4>📋 Как получить вебхук:</h4>
-                    <ol>
-                        <li>Откройте настройки Discord сервера</li>
-                        <li>Перейдите в "Интеграции" → "Вебхуки"</li>
-                        <li>Нажмите "Создать вебхук" или выберите существующий</li>
-                        <li>Скопируйте URL вебхука</li>
-                        <li>Вставьте URL в поле на этом сайте</li>
-                    </ol>
-                </div>
-                
-                <div class="status">
-                    <h4>Статус сервиса:</h4>
-                    <div id="apiStatus">✅ Сервис работает</div>
-                </div>
+            <div class="input-group">
+                <label>Имя бота:</label>
+                <input type="text" id="username" placeholder="Мой Бот">
             </div>
-        </main>
+            
+            <div class="input-group">
+                <label>Сообщение:</label>
+                <textarea id="message" placeholder="Твое сообщение..." required></textarea>
+            </div>
+            
+            <button type="submit">📨 Отправить</button>
+        </form>
         
-        <footer>
-            <p>Powered by Cloudflare Pages + Workers | Ваши вебхуки не сохраняются на сервере</p>
-        </footer>
+        <div id="result"></div>
     </div>
 
     <script src="script.js"></script>
