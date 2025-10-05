@@ -1,5 +1,5 @@
 // ТВОЙ WORKER URL - замени на свой
-const WORKER_URL = 'https://delta-exploits.elektroclesh.workers.dev';
+const WORKER_URL = 'delta-exploits.elektroclesh.workers.dev/';
 
 // Когда страница загрузилась
 document.addEventListener('DOMContentLoaded', function() {
