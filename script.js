@@ -1,6 +1,6 @@
 class DiscordSender {
     constructor() {
-        this.backendUrl = 'https://your-render-app.onrender.com'; // ЗАМЕНИТЕ на ваш Render URL
+        this.backendUrl = 'https://account-backend-delta.onrender.com/'; // ЗАМЕНИТЕ на ваш Render URL
         this.sendBtn = document.getElementById('sendBtn');
         this.statusDiv = document.getElementById('status');
         
