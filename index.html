@@ -1,99 +1,51 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Тест Worker</title>
-    <style>
-        body {
-            font-family: Arial;
-            background: #f0f0f0;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-        .container {
-            background: white;
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-        button {
-            padding: 15px 30px;
-            background: #5865f2;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 18px;
-            cursor: pointer;
-            margin-bottom: 20px;
-        }
-        button:hover {
-            background: #4752c4;
-        }
-        #result {
-            padding: 20px;
-            border-radius: 8px;
-            background: #f8f9fa;
-            border: 2px dashed #ccc;
-            min-height: 60px;
-            font-size: 16px;
-        }
-        .success {
-            background: #d4ffd4 !important;
-            border-color: green !important;
-            color: green;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Отправка в Discord</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <h1>🧪 Тест Worker</h1>
-        <button onclick="getMessage()">🔄 Получить сообщение от Worker</button>
-        <div id="result">Нажми кнопку чтобы получить сообщение</div>
+        <div class="card">
+            <h1>💬 Отправка в Discord</h1>
+            <p class="subtitle">Напишите сообщение и оно придет на ваш Discord сервер</p>
+            
+            <div class="form-group">
+                <label for="username">Ваше имя:</label>
+                <input type="text" id="username" placeholder="Введите ваше имя" value="Гость">
+            </div>
+            
+            <div class="form-group">
+                <label for="message">Сообщение:</label>
+                <textarea id="message" placeholder="Введите ваше сообщение..." rows="4"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="webhookUrl">Webhook URL (опционально):</label>
+                <input type="text" id="webhookUrl" placeholder="https://discord.com/api/webhooks/...">
+                <small>Оставьте пустым, чтобы использовать стандартный</small>
+            </div>
+            
+            <button id="sendBtn" class="send-button">
+                📨 Отправить в Discord
+            </button>
+            
+            <div id="status" class="status"></div>
+            
+            <div class="info">
+                <h3>📋 Как получить Webhook URL:</h3>
+                <ol>
+                    <li>Откройте настройки Discord сервера</li>
+                    <li>Перейдите в "Интеграции" → "Webhooks"</li>
+                    <li>Нажмите "Создать webhook"</li>
+                    <li>Скопируйте URL webhook</li>
+                </ol>
+            </div>
+        </div>
     </div>
-
-    <script>
-        // ⭐ ЗАМЕНИ НА СВОЙ WORKER URL ⭐
-        const WORKER_URL = 'test.elektroclesh.workers.dev';
-        
-        async function getMessage() {
-            const resultDiv = document.getElementById('result');
-            const button = document.querySelector('button');
-            
-            // Блокируем кнопку
-            button.disabled = true;
-            button.textContent = '⏳ Загружаем...';
-            resultDiv.textContent = 'Запрос к Worker...';
-            resultDiv.className = '';
-            
-            try {
-                // Получаем сообщение от Worker
-                const response = await fetch(WORKER_URL + '/get-message');
-                const data = await response.json();
-                
-                if (data.success) {
-                    resultDiv.innerHTML = `
-                        <strong>✅ Сообщение от Worker:</strong><br><br>
-                        "${data.message}"<br><br>
-                        <small>${data.timestamp}</small>
-                    `;
-                    resultDiv.className = 'success';
-                } else {
-                    resultDiv.textContent = '❌ Ошибка: ' + data.error;
-                }
-                
-            } catch (error) {
-                resultDiv.textContent = '❌ Ошибка связи: ' + error.message;
-            } finally {
-                // Разблокируем кнопку
-                button.disabled = false;
-                button.textContent = '🔄 Получить сообщение от Worker';
-            }
-        }
-    </script>
+    
+    <script src="script.js"></script>
 </body>
 </html>
