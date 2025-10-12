@@ -3,68 +3,440 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Обработка входа - Delta Exploits</title>
+    <title>Отслеживание почтовых аккаунтов через Google Auth</title>
     <style>
-        body {
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
-            flex-direction: column;
-            align-items: center;
             justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 800px;
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #4285f4, #34a853, #fbbc05, #ea4335);
+            color: white;
             padding: 20px;
             text-align: center;
+        }
+        
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .description {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .auth-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .google-btn {
+            display: inline-flex;
+            align-items: center;
+            background-color: #4285f4;
             color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
-        .container {
-            background: white;
+        
+        .google-btn:hover {
+            background-color: #3367d6;
+        }
+        
+        .google-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            background-color: white;
+            border-radius: 2px;
+            padding: 3px;
+        }
+        
+        .accounts-section {
+            margin-top: 30px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            margin-bottom: 15px;
             color: #333;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
         }
-        .loading {
-            font-size: 1.2em;
+        
+        .accounts-list {
+            list-style-type: none;
+        }
+        
+        .account-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            background-color: #f9f9f9;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .account-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .account-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #4285f4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+        
+        .account-info {
+            flex-grow: 1;
+        }
+        
+        .account-email {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .account-status {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .logout-btn {
+            background-color: #ea4335;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .logout-btn:hover {
+            background-color: #d33426;
+        }
+        
+        .no-accounts {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .info-box {
+            background-color: #e8f0fe;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #333;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 15px;
+            font-size: 12px;
+            color: #666;
+            border-top: 1px solid #eee;
+        }
+        
+        @media (max-width: 600px) {
+            .content {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 20px;
+            }
+            
+            .account-item {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .account-avatar {
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="loading">Обработка входа...</div>
+        <header>
+            <h1>Отслеживание почтовых аккаунтов</h1>
+            <p class="description">Просмотр всех почтовых аккаунтов, вошедших на вашем устройстве</p>
+        </header>
+        
+        <div class="content">
+            <div class="info-box">
+                <p>Этот сайт поможет вам просмотреть все почтовые аккаунты Google, которые вошли на вашем устройстве. Для работы необходимо авторизоваться через Google.</p>
+                <p><strong>Внимание:</strong> Для работы этого сайта необходимо зарегистрировать приложение в Google Cloud Console и заменить значение переменной <code>CLIENT_ID</code> в коде на ваш собственный.</p>
+            </div>
+            
+            <div class="auth-section">
+                <button id="googleAuthBtn" class="google-btn">
+                    <div class="google-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path fill="#4285f4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                            <path fill="#34a853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path fill="#fbbc05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                            <path fill="#ea4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                        </svg>
+                    </div>
+                    Войти через Google
+                </button>
+                <button id="signOutBtn" class="logout-btn" style="display: none; margin-left: 10px;">Выйти</button>
+            </div>
+            
+            <div class="accounts-section">
+                <h2 class="section-title">Аккаунты на устройстве</h2>
+                <ul id="accountsList" class="accounts-list">
+                    <li class="no-accounts">Нет данных об аккаунтах. Авторизуйтесь для просмотра.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Информация хранится только локально на вашем устройстве и не передается на сервер</p>
+        </footer>
     </div>
 
     <script>
-        // Получаем параметры из URL
-        const urlParams = new URLSearchParams(window.location.hash.substring(1));
-        const token = urlParams.get('access_token');
-        const idToken = urlParams.get('id_token');
-
-        if (idToken) {
-            // Декодируем ID токен чтобы получить данные пользователя
-            try {
-                const payload = JSON.parse(atob(idToken.split('.')[1]));
-                const userData = {
-                    name: payload.name,
-                    email: payload.email,
-                    picture: payload.picture,
-                    sub: payload.sub
+        // Замените этот CLIENT_ID на ваш собственный из Google Cloud Console
+        const CLIENT_ID = '421466180389-4n3a2i95p5ucbo9d0tbve7sroniv042s.apps.googleusercontent.com';
+        const SCOPES = 'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile';
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const googleAuthBtn = document.getElementById('googleAuthBtn');
+            const signOutBtn = document.getElementById('signOutBtn');
+            const accountsList = document.getElementById('accountsList');
+            
+            let googleAuth = null;
+            let currentUser = null;
+            
+            // Инициализация Google Auth
+            function initGoogleAuth() {
+                gapi.load('auth2', function() {
+                    googleAuth = gapi.auth2.init({
+                        client_id: CLIENT_ID,
+                        scope: SCOPES
+                    });
+                    
+                    // Проверяем, авторизован ли пользователь
+                    if (googleAuth.isSignedIn.get()) {
+                        currentUser = googleAuth.currentUser.get();
+                        handleSignIn();
+                    }
+                    
+                    // Обработчик изменения состояния авторизации
+                    googleAuth.isSignedIn.listen(handleAuthChange);
+                });
+            }
+            
+            // Обработчик изменения состояния авторизации
+            function handleAuthChange(isSignedIn) {
+                if (isSignedIn) {
+                    currentUser = googleAuth.currentUser.get();
+                    handleSignIn();
+                } else {
+                    handleSignOut();
+                }
+            }
+            
+            // Обработчик успешного входа
+            function handleSignIn() {
+                if (!currentUser) return;
+                
+                const profile = currentUser.getBasicProfile();
+                const email = profile.getEmail();
+                const name = profile.getName();
+                
+                // Сохраняем информацию об аккаунте
+                saveAccount(email, name);
+                
+                // Обновляем интерфейс
+                updateUI();
+                
+                console.log('Пользователь авторизован:', name, email);
+            }
+            
+            // Обработчик выхода
+            function handleSignOut() {
+                currentUser = null;
+                updateUI();
+                console.log('Пользователь вышел');
+            }
+            
+            // Сохранение информации об аккаунте
+            function saveAccount(email, name) {
+                const accounts = getAccountsFromStorage();
+                
+                // Проверяем, есть ли уже такой аккаунт
+                const existingAccountIndex = accounts.findIndex(acc => acc.email === email);
+                
+                const accountData = {
+                    email: email,
+                    name: name,
+                    loginTime: new Date().toLocaleString('ru-RU')
                 };
                 
-                // Сохраняем в localStorage
-                localStorage.setItem('google_user', JSON.stringify(userData));
-                localStorage.setItem('google_token', idToken);
+                if (existingAccountIndex === -1) {
+                    // Добавляем новый аккаунт
+                    accounts.push(accountData);
+                } else {
+                    // Обновляем существующий аккаунт
+                    accounts[existingAccountIndex] = accountData;
+                }
                 
-                // Перенаправляем на главную страницу
-                window.location.href = 'https://delta-exploits.pages.dev';
-            } catch (error) {
-                console.error('Error decoding token:', error);
-                window.location.href = 'https://delta-exploits.pages.dev';
+                saveAccountsToStorage(accounts);
             }
-        } else {
-            // Если нет токена, возвращаем на главную
-            window.location.href = 'https://delta-exploits.pages.dev';
-        }
+            
+            // Получение аккаунтов из локального хранилища
+            function getAccountsFromStorage() {
+                const storedAccounts = localStorage.getItem('googleAccounts');
+                return storedAccounts ? JSON.parse(storedAccounts) : [];
+            }
+            
+            // Сохранение аккаунтов в локальное хранилище
+            function saveAccountsToStorage(accounts) {
+                localStorage.setItem('googleAccounts', JSON.stringify(accounts));
+            }
+            
+            // Обновление интерфейса
+            function updateUI() {
+                const accounts = getAccountsFromStorage();
+                
+                if (currentUser) {
+                    googleAuthBtn.style.display = 'none';
+                    signOutBtn.style.display = 'inline-block';
+                } else {
+                    googleAuthBtn.style.display = 'inline-block';
+                    signOutBtn.style.display = 'none';
+                }
+                
+                displayAccounts(accounts);
+            }
+            
+            // Отображение списка аккаунтов
+            function displayAccounts(accounts) {
+                if (accounts.length === 0) {
+                    accountsList.innerHTML = '<li class="no-accounts">Нет данных об аккаунтах. Авторизуйтесь для просмотра.</li>';
+                    return;
+                }
+                
+                accountsList.innerHTML = '';
+                
+                accounts.forEach(account => {
+                    const listItem = document.createElement('li');
+                    listItem.className = 'account-item';
+                    
+                    const firstLetter = account.name ? account.name.charAt(0).toUpperCase() : account.email.charAt(0).toUpperCase();
+                    
+                    listItem.innerHTML = `
+                        <div class="account-avatar">${firstLetter}</div>
+                        <div class="account-info">
+                            <div class="account-email">${account.email}</div>
+                            <div class="account-status">${account.name || 'Пользователь Google'} • Вошел ${account.loginTime}</div>
+                        </div>
+                        <button class="logout-btn" data-email="${account.email}">Удалить</button>
+                    `;
+                    
+                    accountsList.appendChild(listItem);
+                });
+                
+                // Добавляем обработчики для кнопок удаления
+                document.querySelectorAll('.logout-btn').forEach(button => {
+                    if (button.id !== 'signOutBtn') {
+                        button.addEventListener('click', function() {
+                            const email = this.getAttribute('data-email');
+                            removeAccount(email);
+                        });
+                    }
+                });
+            }
+            
+            // Удаление аккаунта из списка
+            function removeAccount(email) {
+                const accounts = getAccountsFromStorage();
+                const updatedAccounts = accounts.filter(account => account.email !== email);
+                saveAccountsToStorage(updatedAccounts);
+                updateUI();
+            }
+            
+            // Обработчики событий
+            googleAuthBtn.addEventListener('click', function() {
+                if (googleAuth) {
+                    googleAuth.signIn().then(function() {
+                        // Успешный вход обрабатывается в handleAuthChange
+                    }).catch(function(error) {
+                        console.error('Ошибка авторизации:', error);
+                        alert('Ошибка авторизации: ' + error.error);
+                    });
+                }
+            });
+            
+            signOutBtn.addEventListener('click', function() {
+                if (googleAuth) {
+                    googleAuth.signOut().then(function() {
+                        // Выход обрабатывается в handleAuthChange
+                    });
+                }
+            });
+            
+            // Загружаем Google API и инициализируем авторизацию
+            (function() {
+                const script = document.createElement('script');
+                script.src = 'https://apis.google.com/js/platform.js';
+                script.async = true;
+                script.defer = true;
+                script.onload = initGoogleAuth;
+                document.head.appendChild(script);
+            })();
+            
+            // Инициализация интерфейса
+            updateUI();
+        });
     </script>
 </body>
 </html>
