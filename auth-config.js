@@ -1,6 +1,6 @@
 // Конфигурация Google OAuth
 const GOOGLE_CONFIG = {
-    client_id: "421466180389-4lav1bnhjeejm5meklrbgaavmlajl78b.apps.googleusercontent.com",
+    client_id: "421466180389-vlbok5rmkea0s22evhj2cig4qcie0a01.apps.googleusercontent.com",
     redirect_uri: "https://delta-exploits.pages.dev/auth-callback.html",
     scope: "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email",
     response_type: "token id_token"
