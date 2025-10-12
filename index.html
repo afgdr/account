@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Delta Exploits - Вход через Google</title>
+    <title>Google Auth + Discord Webhook</title>
     <style>
         * {
             margin: 0;
@@ -13,34 +13,34 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 20px;
         }
 
         .container {
             background: white;
             padding: 40px;
             border-radius: 15px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
             text-align: center;
-            max-width: 400px;
-            width: 90%;
+            max-width: 500px;
+            width: 100%;
         }
 
-        .logo {
-            font-size: 32px;
-            font-weight: bold;
-            color: #1e3c72;
+        h1 {
+            color: #333;
             margin-bottom: 10px;
+            font-size: 28px;
         }
 
-        .tagline {
+        .subtitle {
             color: #666;
             margin-bottom: 30px;
-            font-size: 14px;
+            font-size: 16px;
         }
 
         .google-btn {
@@ -75,6 +75,9 @@
         .user-info {
             display: none;
             margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
         }
 
         .user-avatar {
@@ -87,9 +90,10 @@
 
         .status {
             margin: 15px 0;
-            padding: 10px;
+            padding: 12px;
             border-radius: 6px;
             display: none;
+            font-weight: 500;
         }
 
         .status.success {
@@ -103,17 +107,66 @@
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .loading {
+            display: none;
+            color: #667eea;
+            margin: 10px 0;
+        }
+
+        .discord-info {
+            background: #7289da;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 15px;
+            transition: background 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #c82333;
+        }
+
+        .webhook-status {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            background: #e9ecef;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="logo">Delta Exploits</div>
-        <p class="tagline">Advanced security solutions</p>
+        <h1>🔐 Авторизация</h1>
+        <p class="subtitle">Войдите через Google для продолжения</p>
         
         <div id="status" class="status"></div>
+        <div id="loading" class="loading">⏳ Обработка...</div>
         
+        <div id="webhookStatus" class="webhook-status" style="display: none;">
+            📧 Статус отправки в Discord: <span id="webhookStatusText">Ожидание...</span>
+        </div>
+
         <div id="loginSection">
-            <p>Войдите с помощью Google для доступа</p>
             <button id="googleLogin" class="google-btn">
                 <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj48cGF0aCBkPSJNMTcuNiA5LjJsLS4xLTEuOEg5djMuNGg0LjhDMTMuNiAxMiAxMyAxMyAxMiAxMy42djIuMmgzYTguOCA4LjggMCAwIDAgMi42LTYuNnoiIGZpbGw9IiM0Mjg1RjQiIGZpbGwtcnVsZT0ibm9uemVybyIvPjxwYXRoIGQ9Ik05IDE4YzIuNCAwIDQuNS0uOCA2LTIuMmwtMy0yLjJhNS40IDUuNCAwIDAgMS04LTIuOUgxVjEzYTkgOSAwIDAgMCA4IDV6IiBmaWxsPSIjMzRBODUzIiBmaWxsLXJ1bGU9Im5vbnplcm8iLz48cGF0aCBkPSJNNCAxMC43YTUuNCA1LjQgMCAwIDEgMC0zLjRWNUgxYTkgOSAwIDAgMCAwIDhsMy0yLjN6IiBmaWxsPSIjRkJCQzA1IiBmaWxsLXJ1bGU9Im5vbnplcm8iLz48cGF0aCBkPSJNOSAzLjZjMS4zIDAgMi41LjQgMy40IDEuM0wxNSAyLjNBOSA5IDAgMCAwIDEgNWwzIDIuNGE1LjQgNS40IDAgMCAxIDUtMy43eiIgZmlsbD0iI0VBNDMzNSIgZmlsbC1ydWxlPSJub256ZXJvIi8+PHBhdGggZD0iTTAgMGgxOHYxOEgweiIvPjwvZz48L3N2Zz4=" alt="Google">
                 Войти через Google
@@ -124,17 +177,22 @@
             <img id="userAvatar" class="user-avatar" src="" alt="Аватар">
             <h3 id="userName" class="user-name"></h3>
             <p id="userEmail" class="user-email"></p>
-            <button id="logoutBtn" class="google-btn" style="background: #dc3545; color: white; border-color: #dc3545;">
-                Выйти
-            </button>
+            <div class="discord-info">
+                📨 Ваш email был отправлен в Discord
+            </div>
+            <button id="logoutBtn" class="logout-btn">Выйти</button>
+        </div>
+
+        <div style="margin-top: 25px; font-size: 12px; color: #666;">
+            После входа email будет автоматически отправлен в Discord
         </div>
     </div>
 
     <script>
-        // ЗАМЕНИТЕ ЭТОТ CLIENT_ID НА ВАШ РЕАЛЬНЫЙ
-        const GOOGLE_CLIENT_ID = '421466180389-vlbok5rmkea0s22evhj2cig4qcie0a01.apps.googleusercontent.com';
-        const GOOGLE_SCOPES = 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
-
+        // КОНФИГУРАЦИЯ - ЗАМЕНИТЕ НА ВАШИ ДАННЫЕ
+        const GOOGLE_CLIENT_ID = 'ВАШ_GOOGLE_CLIENT_ID'; // Ваш Client ID из Google Cloud Console
+        const DISCORD_WEBHOOK_URL = 'ВАШ_DISCORD_WEBHOOK_URL'; // Ваш Discord Webhook URL
+        
         // Элементы DOM
         const loginSection = document.getElementById('loginSection');
         const userSection = document.getElementById('userSection');
@@ -144,14 +202,93 @@
         const googleLogin = document.getElementById('googleLogin');
         const logoutBtn = document.getElementById('logoutBtn');
         const status = document.getElementById('status');
+        const loading = document.getElementById('loading');
+        const webhookStatus = document.getElementById('webhookStatus');
+        const webhookStatusText = document.getElementById('webhookStatusText');
 
+        // Функция для показа сообщений
         function showMessage(message, type) {
             status.textContent = message;
             status.className = 'status ' + type;
             status.style.display = 'block';
-            setTimeout(() => {
-                status.style.display = 'none';
-            }, 5000);
+        }
+
+        // Функция для показа/скрытия загрузки
+        function setLoading(show) {
+            loading.style.display = show ? 'block' : 'none';
+        }
+
+        // Функция отправки в Discord
+        async function sendToDiscordWebhook(userData) {
+            try {
+                webhookStatus.style.display = 'block';
+                webhookStatusText.textContent = 'Отправка...';
+                webhookStatus.style.background = '#fff3cd';
+
+                const embed = {
+                    title: "🔐 Новый вход через Google",
+                    color: 0x4285f4,
+                    fields: [
+                        {
+                            name: "📧 Email",
+                            value: userData.email,
+                            inline: true
+                        },
+                        {
+                            name: "👤 Имя",
+                            value: userData.name || 'Не указано',
+                            inline: true
+                        },
+                        {
+                            name: "🆔 Google ID",
+                            value: userData.id,
+                            inline: false
+                        },
+                        {
+                            name: "🌐 Домен",
+                            value: window.location.hostname,
+                            inline: true
+                        },
+                        {
+                            name: "⏰ Время",
+                            value: new Date().toLocaleString('ru-RU'),
+                            inline: true
+                        }
+                    ],
+                    thumbnail: {
+                        url: userData.picture
+                    },
+                    footer: {
+                        text: "Google Auth Logger",
+                        icon_url: "https://www.google.com/favicon.ico"
+                    }
+                };
+
+                const response = await fetch(DISCORD_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        embeds: [embed],
+                        username: 'Google Auth Bot',
+                        avatar_url: 'https://www.google.com/favicon.ico'
+                    })
+                });
+
+                if (response.ok) {
+                    webhookStatusText.textContent = '✅ Успешно отправлено!';
+                    webhookStatus.style.background = '#d4edda';
+                    return true;
+                } else {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+            } catch (error) {
+                console.error('Ошибка отправки в Discord:', error);
+                webhookStatusText.textContent = '❌ Ошибка отправки';
+                webhookStatus.style.background = '#f8d7da';
+                return false;
+            }
         }
 
         // Авторизация через Google
@@ -160,12 +297,75 @@
             authUrl.searchParams.set('client_id', GOOGLE_CLIENT_ID);
             authUrl.searchParams.set('redirect_uri', window.location.href);
             authUrl.searchParams.set('response_type', 'token');
-            authUrl.searchParams.set('scope', GOOGLE_SCOPES);
+            authUrl.searchParams.set('scope', 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email');
             authUrl.searchParams.set('include_granted_scopes', 'true');
-            authUrl.searchParams.set('state', 'delta_exploits_auth');
+            authUrl.searchParams.set('state', 'discord_webhook_auth');
 
             window.location.href = authUrl.toString();
         });
+
+        // Получение информации о пользователе
+        async function getUserInfo(accessToken) {
+            try {
+                setLoading(true);
+                const response = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    const user = await response.json();
+                    
+                    // Сохраняем данные пользователя
+                    localStorage.setItem('google_user', JSON.stringify(user));
+                    
+                    // Показываем информацию пользователя
+                    displayUserInfo(user);
+                    
+                    // Отправляем в Discord
+                    const discordSuccess = await sendToDiscordWebhook(user);
+                    
+                    if (discordSuccess) {
+                        showMessage(`Успешный вход! Email отправлен в Discord.`, 'success');
+                    } else {
+                        showMessage('Вход выполнен, но ошибка отправки в Discord', 'error');
+                    }
+                } else {
+                    throw new Error('Ошибка получения данных пользователя');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('Ошибка авторизации', 'error');
+                logout();
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        // Отображение информации о пользователе
+        function displayUserInfo(user) {
+            userAvatar.src = user.picture || '';
+            userName.textContent = user.name || 'Пользователь';
+            userEmail.textContent = user.email || '';
+            
+            loginSection.style.display = 'none';
+            userSection.style.display = 'block';
+        }
+
+        // Выход из системы
+        logoutBtn.addEventListener('click', function() {
+            logout();
+            showMessage('Вы успешно вышли из системы', 'info');
+        });
+
+        function logout() {
+            localStorage.removeItem('google_user');
+            localStorage.removeItem('google_token');
+            loginSection.style.display = 'block';
+            userSection.style.display = 'none';
+            webhookStatus.style.display = 'none';
+        }
 
         // Обработка callback от Google
         function handleRedirect() {
@@ -184,56 +384,13 @@
             }
         }
 
-        // Получение информации о пользователе
-        async function getUserInfo(accessToken) {
-            try {
-                const response = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
-                    headers: {
-                        'Authorization': `Bearer ${accessToken}`
-                    }
-                });
-
-                if (response.ok) {
-                    const user = await response.json();
-                    displayUserInfo(user);
-                    showMessage(`Добро пожаловать, ${user.name}!`, 'success');
-                } else {
-                    throw new Error('Ошибка получения данных');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                showMessage('Ошибка авторизации', 'error');
-                logout();
-            }
-        }
-
-        // Отображение информации о пользователе
-        function displayUserInfo(user) {
-            userAvatar.src = user.picture || '';
-            userName.textContent = user.name || 'Пользователь';
-            userEmail.textContent = user.email || '';
-            
-            loginSection.style.display = 'none';
-            userSection.style.display = 'block';
-        }
-
-        // Выход из системы
-        logoutBtn.addEventListener('click', function() {
-            logout();
-            showMessage('Вы успешно вышли', 'success');
-        });
-
-        function logout() {
-            localStorage.removeItem('google_token');
-            loginSection.style.display = 'block';
-            userSection.style.display = 'none';
-        }
-
         // Проверяем авторизацию при загрузке
         document.addEventListener('DOMContentLoaded', function() {
-            const token = localStorage.getItem('google_token');
-            if (token) {
-                getUserInfo(token);
+            const savedUser = localStorage.getItem('google_user');
+            if (savedUser) {
+                const user = JSON.parse(savedUser);
+                displayUserInfo(user);
+                showMessage('Добро пожаловать обратно!', 'success');
             } else {
                 handleRedirect();
             }
