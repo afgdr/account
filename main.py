@@ -14,13 +14,14 @@ app.add_middleware(
     session_cookie="google_auth_session"
 )
 
-# OAuth конфигурация
+# OAuth конфигурация - ИСПРАВЛЕННЫЙ URL
 oauth = OAuth()
 oauth.register(
     name='google',
     client_id=os.getenv('GOOGLE_CLIENT_ID'),
     client_secret=os.getenv('GOOGLE_CLIENT_SECRET'),
-    server_metadata_url='https://accounts.google.com/.well-known/openid_configuration',
+    # ИСПРАВЛЕННЫЙ URL метаданных
+    server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
     client_kwargs={
         'scope': 'openid email profile',
         'prompt': 'select_account'
@@ -43,21 +44,32 @@ async def home(request: Request):
 @app.get("/login")
 async def login(request: Request):
     """Начало OAuth потока - перенаправление на Google"""
-    # Явно указываем redirect_uri для вашего домена
-    redirect_uri = "https://account-login-com.onrender.com/auth/callback"
-    return await oauth.google.authorize_redirect(request, redirect_uri)
+    try:
+        redirect_uri = "https://account-login-com.onrender.com/auth/callback"
+        return await oauth.google.authorize_redirect(request, redirect_uri)
+    except Exception as e:
+        error_html = f"""
+        <html>
+            <body style="background: #000; color: white; padding: 20px;">
+                <h1>Ошибка OAuth</h1>
+                <p>Не удалось инициализировать OAuth: {str(e)}</p>
+                <a href="/">Вернуться на главную</a>
+            </body>
+        </html>
+        """
+        return HTMLResponse(content=error_html, status_code=500)
 
 @app.get("/auth/callback")
 async def auth_callback(request: Request):
     """Обработка callback от Google"""
     try:
-        # Явно указываем redirect_uri при получении токена
         redirect_uri = "https://account-login-com.onrender.com/auth/callback"
-        token = await oauth.google.authorize_access_token(request, redirect_uri=redirect_uri)
+        token = await oauth.google.authorize_access_token(request)
         user_info = token.get('userinfo')
         
         if not user_info:
-            raise HTTPException(status_code=400, detail="Не удалось получить данные пользователя")
+            # Если userinfo нет в токене, запрашиваем отдельно
+            user_info = await oauth.google.userinfo(request=request, token=token)
         
         request.session['user'] = {
             'id': user_info['sub'],
@@ -88,10 +100,8 @@ async def dashboard(request: Request):
     if not user:
         return RedirectResponse(url="/")
     
-    # Читаем dashboard.html и подставляем данные
     html_content = read_html_file("dashboard.html")
     
-    # Заменяем плейсхолдеры на реальные данные
     replacements = {
         "{{ user.name }}": user.get('name', ''),
         "{{ user.email }}": user.get('email', ''),
@@ -122,6 +132,25 @@ async def get_current_user(request: Request):
 async def health_check():
     """Проверка здоровья приложения"""
     return {"status": "healthy", "service": "Google OAuth"}
+
+# Альтернативная конфигурация если основная не работает
+@app.get("/login-alt")
+async def login_alternative(request: Request):
+    """Альтернативный метод входа с ручной настройкой"""
+    from authlib.common.urls import add_params_to_uri
+    
+    auth_url = "https://accounts.google.com/o/oauth2/v2/auth"
+    params = {
+        'client_id': os.getenv('GOOGLE_CLIENT_ID'),
+        'response_type': 'code',
+        'scope': 'openid email profile',
+        'redirect_uri': 'https://account-login-com.onrender.com/auth/callback',
+        'prompt': 'select_account',
+        'access_type': 'offline'
+    }
+    
+    auth_url = add_params_to_uri(auth_url, params)
+    return RedirectResponse(url=auth_url)
 
 if __name__ == "__main__":
     import uvicorn
