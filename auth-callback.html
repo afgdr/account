@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Отслеживание почтовых аккаунтов через Google Auth</title>
+    <title>Delta Exploits - Отслеживание почтовых аккаунтов</title>
     <style>
         * {
             margin: 0;
@@ -172,6 +172,27 @@
             color: #333;
         }
         
+        .setup-instructions {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .setup-instructions h3 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+        
+        .setup-instructions code {
+            background-color: #f8f9fa;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+        
         footer {
             text-align: center;
             padding: 15px;
@@ -204,14 +225,23 @@
 <body>
     <div class="container">
         <header>
-            <h1>Отслеживание почтовых аккаунтов</h1>
+            <h1>Delta Exploits - Отслеживание аккаунтов</h1>
             <p class="description">Просмотр всех почтовых аккаунтов, вошедших на вашем устройстве</p>
         </header>
         
         <div class="content">
+            <div class="setup-instructions">
+                <h3>Настройка Google OAuth</h3>
+                <p>Для работы приложения необходимо:</p>
+                <ol>
+                    <li>Создать OAuth client в <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a></li>
+                    <li>Добавить в Authorized JavaScript origins: <code>https://delta-exploits.pages.dev</code></li>
+                    <li>Заменить <code>YOUR_CLIENT_ID</code> в коде на ваш Client ID</li>
+                </ol>
+            </div>
+            
             <div class="info-box">
                 <p>Этот сайт поможет вам просмотреть все почтовые аккаунты Google, которые вошли на вашем устройстве. Для работы необходимо авторизоваться через Google.</p>
-                <p><strong>Внимание:</strong> Для работы этого сайта необходимо зарегистрировать приложение в Google Cloud Console и заменить значение переменной <code>CLIENT_ID</code> в коде на ваш собственный.</p>
             </div>
             
             <div class="auth-section">
@@ -238,13 +268,13 @@
         </div>
         
         <footer>
-            <p>Информация хранится только локально на вашем устройстве и не передается на сервер</p>
+            <p>Delta Exploits • Информация хранится только локально на вашем устройстве</p>
         </footer>
     </div>
 
     <script>
-        // Замените этот CLIENT_ID на ваш собственный из Google Cloud Console
-        const CLIENT_ID = '421466180389-4n3a2i95p5ucbo9d0tbve7sroniv042s.apps.googleusercontent.com';
+        // ЗАМЕНИТЕ ЭТОТ CLIENT_ID НА ВАШ РЕАЛЬНЫЙ ИЗ GOOGLE CLOUD CONSOLE
+        const CLIENT_ID = 'YOUR_CLIENT_ID.apps.googleusercontent.com';
         const SCOPES = 'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile';
         
         document.addEventListener('DOMContentLoaded', function() {
@@ -255,12 +285,23 @@
             let googleAuth = null;
             let currentUser = null;
             
+            // Проверка корректности Client ID
+            if (CLIENT_ID.includes('YOUR_CLIENT_ID')) {
+                const authSection = document.querySelector('.auth-section');
+                authSection.innerHTML = `
+                    <div style="color: #d33426; background: #ffeaea; padding: 15px; border-radius: 8px;">
+                        <strong>Требуется настройка:</strong> Замените CLIENT_ID в коде на ваш реальный Client ID из Google Cloud Console
+                    </div>
+                `;
+            }
+            
             // Инициализация Google Auth
             function initGoogleAuth() {
                 gapi.load('auth2', function() {
                     googleAuth = gapi.auth2.init({
                         client_id: CLIENT_ID,
-                        scope: SCOPES
+                        scope: SCOPES,
+                        cookie_policy: 'single_host_origin'
                     });
                     
                     // Проверяем, авторизован ли пользователь
@@ -291,9 +332,10 @@
                 const profile = currentUser.getBasicProfile();
                 const email = profile.getEmail();
                 const name = profile.getName();
+                const imageUrl = profile.getImageUrl();
                 
                 // Сохраняем информацию об аккаунте
-                saveAccount(email, name);
+                saveAccount(email, name, imageUrl);
                 
                 // Обновляем интерфейс
                 updateUI();
@@ -309,7 +351,7 @@
             }
             
             // Сохранение информации об аккаунте
-            function saveAccount(email, name) {
+            function saveAccount(email, name, imageUrl) {
                 const accounts = getAccountsFromStorage();
                 
                 // Проверяем, есть ли уже такой аккаунт
@@ -318,7 +360,9 @@
                 const accountData = {
                     email: email,
                     name: name,
-                    loginTime: new Date().toLocaleString('ru-RU')
+                    imageUrl: imageUrl,
+                    loginTime: new Date().toLocaleString('ru-RU'),
+                    lastSeen: new Date().toISOString()
                 };
                 
                 if (existingAccountIndex === -1) {
@@ -334,13 +378,13 @@
             
             // Получение аккаунтов из локального хранилища
             function getAccountsFromStorage() {
-                const storedAccounts = localStorage.getItem('googleAccounts');
+                const storedAccounts = localStorage.getItem('deltaExploitsAccounts');
                 return storedAccounts ? JSON.parse(storedAccounts) : [];
             }
             
             // Сохранение аккаунтов в локальное хранилище
             function saveAccountsToStorage(accounts) {
-                localStorage.setItem('googleAccounts', JSON.stringify(accounts));
+                localStorage.setItem('deltaExploitsAccounts', JSON.stringify(accounts));
             }
             
             // Обновление интерфейса
@@ -374,7 +418,9 @@
                     const firstLetter = account.name ? account.name.charAt(0).toUpperCase() : account.email.charAt(0).toUpperCase();
                     
                     listItem.innerHTML = `
-                        <div class="account-avatar">${firstLetter}</div>
+                        <div class="account-avatar" style="${account.imageUrl ? `background-image: url('${account.imageUrl}'); background-size: cover;` : ''}">
+                            ${account.imageUrl ? '' : firstLetter}
+                        </div>
                         <div class="account-info">
                             <div class="account-email">${account.email}</div>
                             <div class="account-status">${account.name || 'Пользователь Google'} • Вошел ${account.loginTime}</div>
