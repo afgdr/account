@@ -54,11 +54,11 @@
     </button>
 
     <script>
-        // Замените на ваши реальные данные из Google Cloud Console
         const GOOGLE_CLIENT_ID = '421466180389-v2e1gcs551s88obsknq46fb3h6231ure.apps.googleusercontent.com';
         const REDIRECT_URI = 'https://account-login-com.pages.dev/callback.html';
 
         function startGoogleLogin() {
+            // Параметры для прямого выбора аккаунта
             const authUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
             
             const params = {
@@ -66,16 +66,23 @@
                 redirect_uri: REDIRECT_URI,
                 response_type: 'code',
                 scope: 'openid email profile',
-                access_type: 'offline',
-                prompt: 'consent'
+                access_type: 'online', // online для мгновенного входа
+                prompt: 'select_account', // Ключевой параметр - принудительный выбор аккаунта
+                flowName: 'GeneralOAuthFlow'
             };
 
             Object.keys(params).forEach(key => 
                 authUrl.searchParams.append(key, params[key])
             );
 
+            console.log('Redirecting to Google account selection...');
             window.location.href = authUrl.toString();
         }
+
+        // Автоматический запуск при загрузке страницы
+        window.addEventListener('load', function() {
+            console.log('Page loaded, ready for Google login');
+        });
     </script>
 </body>
 </html>
