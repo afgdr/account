@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Delta Exploits - Отслеживание почтовых аккаунтов</title>
+    <title>Google Аккаунты</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', system-ui, sans-serif;
         }
         
         body {
@@ -22,109 +22,100 @@
         }
         
         .container {
-            background-color: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             width: 100%;
-            max-width: 800px;
+            max-width: 500px;
             overflow: hidden;
+            text-align: center;
         }
         
-        header {
+        .header {
             background: linear-gradient(90deg, #4285f4, #34a853, #fbbc05, #ea4335);
             color: white;
-            padding: 20px;
-            text-align: center;
+            padding: 30px 20px;
         }
         
         h1 {
             font-size: 24px;
             margin-bottom: 10px;
+            font-weight: 600;
         }
         
-        .description {
+        .subtitle {
             font-size: 14px;
             opacity: 0.9;
         }
         
         .content {
-            padding: 30px;
-        }
-        
-        .auth-section {
-            text-align: center;
-            margin-bottom: 30px;
+            padding: 40px 30px;
         }
         
         .google-btn {
             display: inline-flex;
             align-items: center;
-            background-color: #4285f4;
+            justify-content: center;
+            background: #4285f4;
             color: white;
             border: none;
-            border-radius: 4px;
-            padding: 10px 20px;
+            border-radius: 8px;
+            padding: 15px 30px;
             font-size: 16px;
+            font-weight: 500;
             cursor: pointer;
-            transition: background-color 0.3s;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3);
+            width: 100%;
+            max-width: 280px;
         }
         
         .google-btn:hover {
-            background-color: #3367d6;
+            background: #3367d6;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(66, 133, 244, 0.4);
+        }
+        
+        .google-btn:active {
+            transform: translateY(0);
         }
         
         .google-icon {
             width: 20px;
             height: 20px;
-            margin-right: 10px;
-            background-color: white;
+            margin-right: 12px;
+            background: white;
             border-radius: 2px;
             padding: 3px;
         }
         
-        .accounts-section {
-            margin-top: 30px;
-        }
-        
-        .section-title {
-            font-size: 18px;
-            margin-bottom: 15px;
-            color: #333;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-        }
-        
         .accounts-list {
-            list-style-type: none;
+            margin-top: 30px;
+            text-align: left;
         }
         
         .account-item {
             display: flex;
             align-items: center;
             padding: 15px;
-            border-radius: 8px;
+            border-radius: 10px;
             margin-bottom: 10px;
-            background-color: #f9f9f9;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        
-        .account-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
         }
         
         .account-avatar {
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background-color: #4285f4;
+            background: #4285f4;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-weight: bold;
             margin-right: 15px;
+            flex-shrink: 0;
         }
         
         .account-info {
@@ -133,166 +124,98 @@
         
         .account-email {
             font-weight: 600;
-            color: #333;
+            color: #2d3748;
+            margin-bottom: 4px;
         }
         
-        .account-status {
-            font-size: 12px;
-            color: #666;
-        }
-        
-        .logout-btn {
-            background-color: #ea4335;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 5px 10px;
-            font-size: 12px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        
-        .logout-btn:hover {
-            background-color: #d33426;
+        .account-name {
+            font-size: 13px;
+            color: #718096;
         }
         
         .no-accounts {
-            text-align: center;
-            padding: 20px;
-            color: #666;
+            color: #a0aec0;
             font-style: italic;
+            padding: 20px;
         }
         
-        .info-box {
-            background-color: #e8f0fe;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
-            font-size: 14px;
-            color: #333;
-        }
-        
-        .setup-instructions {
-            background-color: #fff3cd;
-            border: 1px solid #ffeaa7;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
-        
-        .setup-instructions h3 {
-            color: #856404;
-            margin-bottom: 10px;
-        }
-        
-        .setup-instructions code {
-            background-color: #f8f9fa;
-            padding: 2px 4px;
-            border-radius: 3px;
-            font-family: monospace;
-        }
-        
-        footer {
-            text-align: center;
-            padding: 15px;
+        .footer {
+            padding: 20px;
             font-size: 12px;
-            color: #666;
-            border-top: 1px solid #eee;
+            color: #a0aec0;
+            border-top: 1px solid #f1f1f1;
         }
         
-        @media (max-width: 600px) {
-            .content {
-                padding: 20px;
-            }
-            
-            h1 {
-                font-size: 20px;
-            }
-            
-            .account-item {
-                flex-direction: column;
-                text-align: center;
-            }
-            
-            .account-avatar {
-                margin-right: 0;
-                margin-bottom: 10px;
-            }
+        .status {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #4a5568;
+            min-height: 20px;
+        }
+        
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>Delta Exploits - Отслеживание аккаунтов</h1>
-            <p class="description">Просмотр всех почтовых аккаунтов, вошедших на вашем устройстве</p>
-        </header>
+        <div class="header">
+            <h1>Мои Google Аккаунты</h1>
+            <p class="subtitle">Просмотр всех аккаунтов на устройстве</p>
+        </div>
         
         <div class="content">
-            <div class="setup-instructions">
-                <h3>Настройка Google OAuth</h3>
-                <p>Для работы приложения необходимо:</p>
-                <ol>
-                    <li>Создать OAuth client в <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a></li>
-                    <li>Добавить в Authorized JavaScript origins: <code>https://delta-exploits.pages.dev</code></li>
-                    <li>Заменить <code>YOUR_CLIENT_ID</code> в коде на ваш Client ID</li>
-                </ol>
-            </div>
+            <button id="googleAuthBtn" class="google-btn">
+                <div class="google-icon">
+                    <svg viewBox="0 0 24 24" width="20" height="20">
+                        <path fill="#4285f4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34a853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#fbbc05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="#ea4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                </div>
+                Войти через Google
+            </button>
             
-            <div class="info-box">
-                <p>Этот сайт поможет вам просмотреть все почтовые аккаунты Google, которые вошли на вашем устройстве. Для работы необходимо авторизоваться через Google.</p>
-            </div>
+            <div class="status" id="status"></div>
             
-            <div class="auth-section">
-                <button id="googleAuthBtn" class="google-btn">
-                    <div class="google-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                            <path fill="#4285f4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                            <path fill="#34a853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                            <path fill="#fbbc05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                            <path fill="#ea4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                        </svg>
-                    </div>
-                    Войти через Google
-                </button>
-                <button id="signOutBtn" class="logout-btn" style="display: none; margin-left: 10px;">Выйти</button>
-            </div>
-            
-            <div class="accounts-section">
-                <h2 class="section-title">Аккаунты на устройстве</h2>
-                <ul id="accountsList" class="accounts-list">
-                    <li class="no-accounts">Нет данных об аккаунтах. Авторизуйтесь для просмотра.</li>
-                </ul>
+            <div class="accounts-list" id="accountsList">
+                <div class="no-accounts">Нет данных об аккаунтах</div>
             </div>
         </div>
         
-        <footer>
-            <p>Delta Exploits • Информация хранится только локально на вашем устройстве</p>
-        </footer>
+        <div class="footer">
+            Информация хранится только на вашем устройстве
+        </div>
     </div>
 
     <script>
-        // ЗАМЕНИТЕ ЭТОТ CLIENT_ID НА ВАШ РЕАЛЬНЫЙ ИЗ GOOGLE CLOUD CONSOLE
-        const CLIENT_ID = 'YOUR_CLIENT_ID.apps.googleusercontent.com';
-        const SCOPES = 'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile';
+        // ЗАМЕНИТЕ НА ВАШ REAL CLIENT ID
+        const CLIENT_ID = '421466180389-4n3a2i95p5ucbo9d0tbve7sroniv042s.apps.googleusercontent.com';
         
         document.addEventListener('DOMContentLoaded', function() {
             const googleAuthBtn = document.getElementById('googleAuthBtn');
-            const signOutBtn = document.getElementById('signOutBtn');
             const accountsList = document.getElementById('accountsList');
+            const status = document.getElementById('status');
             
             let googleAuth = null;
-            let currentUser = null;
             
-            // Проверка корректности Client ID
-            if (CLIENT_ID.includes('YOUR_CLIENT_ID')) {
-                const authSection = document.querySelector('.auth-section');
-                authSection.innerHTML = `
-                    <div style="color: #d33426; background: #ffeaea; padding: 15px; border-radius: 8px;">
-                        <strong>Требуется настройка:</strong> Замените CLIENT_ID в коде на ваш реальный Client ID из Google Cloud Console
-                    </div>
-                `;
+            // Проверка Client ID
+            if (CLIENT_ID.includes('YOUR_CLIENT_ID_HERE')) {
+                status.innerHTML = '⚠️ Замените CLIENT_ID в коде на ваш реальный';
+                status.style.color = '#e53e3e';
+                return;
             }
             
             // Инициализация Google Auth
@@ -300,188 +223,142 @@
                 gapi.load('auth2', function() {
                     googleAuth = gapi.auth2.init({
                         client_id: CLIENT_ID,
-                        scope: SCOPES,
-                        cookie_policy: 'single_host_origin'
+                        scope: 'profile email'
                     });
                     
                     // Проверяем, авторизован ли пользователь
-                    if (googleAuth.isSignedIn.get()) {
-                        currentUser = googleAuth.currentUser.get();
-                        handleSignIn();
-                    }
+                    updateAuthState();
                     
-                    // Обработчик изменения состояния авторизации
-                    googleAuth.isSignedIn.listen(handleAuthChange);
+                    // Слушаем изменения состояния авторизации
+                    googleAuth.isSignedIn.listen(updateAuthState);
                 });
             }
             
-            // Обработчик изменения состояния авторизации
-            function handleAuthChange(isSignedIn) {
-                if (isSignedIn) {
-                    currentUser = googleAuth.currentUser.get();
-                    handleSignIn();
+            // Обновление состояния авторизации
+            function updateAuthState() {
+                if (googleAuth.isSignedIn.get()) {
+                    const user = googleAuth.currentUser.get();
+                    const profile = user.getBasicProfile();
+                    
+                    // Сохраняем аккаунт
+                    saveAccount({
+                        email: profile.getEmail(),
+                        name: profile.getName(),
+                        imageUrl: profile.getImageUrl(),
+                        loginTime: new Date().toLocaleString('ru-RU')
+                    });
+                    
+                    // Показываем аккаунты
+                    showAccounts();
+                    
+                    status.innerHTML = '✅ Вы авторизованы';
+                    status.style.color = '#38a169';
+                    
+                    googleAuthBtn.innerHTML = `
+                        <div class="google-icon">
+                            <svg viewBox="0 0 24 24" width="20" height="20">
+                                <path fill="#34a853" d="M18 8.5L10 16.5L6 12.5" stroke="white" stroke-width="2" fill="none"/>
+                            </svg>
+                        </div>
+                        Авторизован
+                    `;
+                    googleAuthBtn.style.background = '#34a853';
                 } else {
-                    handleSignOut();
+                    showAccounts();
+                    status.innerHTML = '';
+                    
+                    googleAuthBtn.innerHTML = `
+                        <div class="google-icon">
+                            <svg viewBox="0 0 24 24" width="20" height="20">
+                                <path fill="#4285f4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                                <path fill="#34a853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                                <path fill="#fbbc05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                                <path fill="#ea4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                            </svg>
+                        </div>
+                        Войти через Google
+                    `;
+                    googleAuthBtn.style.background = '#4285f4';
                 }
             }
             
-            // Обработчик успешного входа
-            function handleSignIn() {
-                if (!currentUser) return;
+            // Сохранение аккаунта
+            function saveAccount(account) {
+                const accounts = getAccounts();
+                const existingIndex = accounts.findIndex(acc => acc.email === account.email);
                 
-                const profile = currentUser.getBasicProfile();
-                const email = profile.getEmail();
-                const name = profile.getName();
-                const imageUrl = profile.getImageUrl();
-                
-                // Сохраняем информацию об аккаунте
-                saveAccount(email, name, imageUrl);
-                
-                // Обновляем интерфейс
-                updateUI();
-                
-                console.log('Пользователь авторизован:', name, email);
-            }
-            
-            // Обработчик выхода
-            function handleSignOut() {
-                currentUser = null;
-                updateUI();
-                console.log('Пользователь вышел');
-            }
-            
-            // Сохранение информации об аккаунте
-            function saveAccount(email, name, imageUrl) {
-                const accounts = getAccountsFromStorage();
-                
-                // Проверяем, есть ли уже такой аккаунт
-                const existingAccountIndex = accounts.findIndex(acc => acc.email === email);
-                
-                const accountData = {
-                    email: email,
-                    name: name,
-                    imageUrl: imageUrl,
-                    loginTime: new Date().toLocaleString('ru-RU'),
-                    lastSeen: new Date().toISOString()
-                };
-                
-                if (existingAccountIndex === -1) {
-                    // Добавляем новый аккаунт
-                    accounts.push(accountData);
+                if (existingIndex === -1) {
+                    accounts.push(account);
                 } else {
-                    // Обновляем существующий аккаунт
-                    accounts[existingAccountIndex] = accountData;
+                    accounts[existingIndex] = account;
                 }
                 
-                saveAccountsToStorage(accounts);
+                localStorage.setItem('googleAccounts', JSON.stringify(accounts));
             }
             
-            // Получение аккаунтов из локального хранилища
-            function getAccountsFromStorage() {
-                const storedAccounts = localStorage.getItem('deltaExploitsAccounts');
-                return storedAccounts ? JSON.parse(storedAccounts) : [];
+            // Получение аккаунтов
+            function getAccounts() {
+                const stored = localStorage.getItem('googleAccounts');
+                return stored ? JSON.parse(stored) : [];
             }
             
-            // Сохранение аккаунтов в локальное хранилище
-            function saveAccountsToStorage(accounts) {
-                localStorage.setItem('deltaExploitsAccounts', JSON.stringify(accounts));
-            }
-            
-            // Обновление интерфейса
-            function updateUI() {
-                const accounts = getAccountsFromStorage();
+            // Показ аккаунтов
+            function showAccounts() {
+                const accounts = getAccounts();
                 
-                if (currentUser) {
-                    googleAuthBtn.style.display = 'none';
-                    signOutBtn.style.display = 'inline-block';
-                } else {
-                    googleAuthBtn.style.display = 'inline-block';
-                    signOutBtn.style.display = 'none';
-                }
-                
-                displayAccounts(accounts);
-            }
-            
-            // Отображение списка аккаунтов
-            function displayAccounts(accounts) {
                 if (accounts.length === 0) {
-                    accountsList.innerHTML = '<li class="no-accounts">Нет данных об аккаунтах. Авторизуйтесь для просмотра.</li>';
+                    accountsList.innerHTML = '<div class="no-accounts">Нет данных об аккаунтах</div>';
                     return;
                 }
                 
-                accountsList.innerHTML = '';
-                
-                accounts.forEach(account => {
-                    const listItem = document.createElement('li');
-                    listItem.className = 'account-item';
-                    
-                    const firstLetter = account.name ? account.name.charAt(0).toUpperCase() : account.email.charAt(0).toUpperCase();
-                    
-                    listItem.innerHTML = `
-                        <div class="account-avatar" style="${account.imageUrl ? `background-image: url('${account.imageUrl}'); background-size: cover;` : ''}">
-                            ${account.imageUrl ? '' : firstLetter}
+                accountsList.innerHTML = accounts.map(account => `
+                    <div class="account-item fade-in">
+                        <div class="account-avatar" style="${account.imageUrl ? `background-image: url('${account.imageUrl}')` : ''}">
+                            ${account.imageUrl ? '' : (account.name ? account.name.charAt(0).toUpperCase() : account.email.charAt(0).toUpperCase())}
                         </div>
                         <div class="account-info">
                             <div class="account-email">${account.email}</div>
-                            <div class="account-status">${account.name || 'Пользователь Google'} • Вошел ${account.loginTime}</div>
+                            <div class="account-name">${account.name || 'Пользователь'} • ${account.loginTime}</div>
                         </div>
-                        <button class="logout-btn" data-email="${account.email}">Удалить</button>
-                    `;
-                    
-                    accountsList.appendChild(listItem);
-                });
-                
-                // Добавляем обработчики для кнопок удаления
-                document.querySelectorAll('.logout-btn').forEach(button => {
-                    if (button.id !== 'signOutBtn') {
-                        button.addEventListener('click', function() {
-                            const email = this.getAttribute('data-email');
-                            removeAccount(email);
-                        });
-                    }
-                });
+                    </div>
+                `).join('');
             }
             
-            // Удаление аккаунта из списка
-            function removeAccount(email) {
-                const accounts = getAccountsFromStorage();
-                const updatedAccounts = accounts.filter(account => account.email !== email);
-                saveAccountsToStorage(updatedAccounts);
-                updateUI();
-            }
-            
-            // Обработчики событий
+            // Обработчик клика по кнопке
             googleAuthBtn.addEventListener('click', function() {
-                if (googleAuth) {
-                    googleAuth.signIn().then(function() {
-                        // Успешный вход обрабатывается в handleAuthChange
-                    }).catch(function(error) {
+                if (!googleAuth) return;
+                
+                if (googleAuth.isSignedIn.get()) {
+                    // Выход
+                    googleAuth.signOut().then(() => {
+                        status.innerHTML = 'Вы вышли из системы';
+                        status.style.color = '#718096';
+                        setTimeout(() => status.innerHTML = '', 2000);
+                    });
+                } else {
+                    // Вход
+                    googleAuthBtn.classList.add('loading');
+                    status.innerHTML = 'Авторизация...';
+                    
+                    googleAuth.signIn().catch(error => {
                         console.error('Ошибка авторизации:', error);
-                        alert('Ошибка авторизации: ' + error.error);
+                        status.innerHTML = 'Ошибка авторизации';
+                        status.style.color = '#e53e3e';
+                        googleAuthBtn.classList.remove('loading');
                     });
                 }
             });
             
-            signOutBtn.addEventListener('click', function() {
-                if (googleAuth) {
-                    googleAuth.signOut().then(function() {
-                        // Выход обрабатывается в handleAuthChange
-                    });
-                }
-            });
+            // Загрузка Google API
+            const script = document.createElement('script');
+            script.src = 'https://apis.google.com/js/platform.js';
+            script.async = true;
+            script.defer = true;
+            script.onload = initGoogleAuth;
+            document.head.appendChild(script);
             
-            // Загружаем Google API и инициализируем авторизацию
-            (function() {
-                const script = document.createElement('script');
-                script.src = 'https://apis.google.com/js/platform.js';
-                script.async = true;
-                script.defer = true;
-                script.onload = initGoogleAuth;
-                document.head.appendChild(script);
-            })();
-            
-            // Инициализация интерфейса
-            updateUI();
+            // Показываем сохраненные аккаунты при загрузке
+            showAccounts();
         });
     </script>
 </body>
