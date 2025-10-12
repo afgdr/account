@@ -3,303 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Автоматическая Google Auth</title>
+    <title>Вход через Google</title>
     <style>
-        * {
+        body {
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', system-ui, sans-serif;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-            min-height: 100vh;
+            background-color: #000;
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            color: white;
+            font-family: Arial, sans-serif;
         }
-        
-        .container {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 40px;
-            text-align: center;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            max-width: 500px;
-            width: 90%;
-        }
-        
-        .logo {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(45deg, #4285f4, #34a853, #fbbc05, #ea4335);
-            border-radius: 50%;
-            margin: 0 auto 20px;
+
+        .google-btn {
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 32px;
-            font-weight: bold;
-        }
-        
-        h1 {
-            font-size: 28px;
-            margin-bottom: 10px;
-            background: linear-gradient(45deg, #4285f4, #34a853);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        .status {
-            margin: 20px 0;
-            padding: 15px;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.1);
-        }
-        
-        .user-info {
-            margin: 20px 0;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            text-align: left;
-        }
-        
-        .avatar {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: #4285f4;
-            margin-right: 15px;
-            float: left;
-        }
-        
-        .user-details {
-            overflow: hidden;
-        }
-        
-        .user-email {
-            font-weight: bold;
-            font-size: 18px;
-            margin-bottom: 5px;
-        }
-        
-        .user-name {
-            color: #ccc;
-            font-size: 14px;
-        }
-        
-        .btn {
-            background: #4285f4;
-            color: white;
+            background: white;
+            color: #757575;
             border: none;
-            padding: 12px 30px;
-            border-radius: 8px;
+            border-radius: 4px;
+            padding: 12px 24px;
             font-size: 16px;
+            font-weight: 500;
             cursor: pointer;
-            margin: 10px;
-            transition: all 0.3s ease;
+            transition: background-color 0.3s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.25);
         }
-        
-        .btn:hover {
-            background: #3367d6;
-            transform: translateY(-2px);
+
+        .google-btn:hover {
+            background: #f8f8f8;
         }
-        
-        .btn-logout {
-            background: #ea4335;
-        }
-        
-        .btn-logout:hover {
-            background: #d33426;
-        }
-        
-        .loading {
-            display: inline-block;
+
+        .google-icon {
             width: 20px;
             height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        .hidden {
-            display: none;
+            margin-right: 12px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="logo">G</div>
-        <h1>Автоматическая авторизация</h1>
-        <p>Вход через Google Account</p>
-        
-        <div class="status" id="status">
-            <div class="loading"></div>
-            Инициализация Google Auth...
-        </div>
-        
-        <div class="user-info hidden" id="userInfo">
-            <div class="avatar" id="userAvatar"></div>
-            <div class="user-details">
-                <div class="user-email" id="userEmail"></div>
-                <div class="user-name" id="userName"></div>
-            </div>
-            <div style="clear: both;"></div>
-        </div>
-        
-        <div class="actions hidden" id="actions">
-            <button class="btn btn-logout" onclick="signOut()">Выйти</button>
-            <button class="btn" onclick="getUserInfo()">Обновить данные</button>
-        </div>
-    </div>
+    <button class="google-btn" onclick="startGoogleLogin()">
+        <svg class="google-icon" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+        </svg>
+        Войти через Google
+    </button>
 
     <script>
-        // Конфигурация Google OAuth
-        const CLIENT_ID = '421466180389-v2e1gcs551s88obsknq46fb3h6231ure.apps.googleusercontent.com';
-        
-        let googleAuth = null;
-        let currentUser = null;
+        // Замените на ваши реальные данные из Google Cloud Console
+        const GOOGLE_CLIENT_ID = '421466180389-v2e1gcs551s88obsknq46fb3h6231ure.apps.googleusercontent.com';
+        const REDIRECT_URI = 'https://account-login-com.pages.dev/callback.html';
 
-        // Инициализация Google Auth
-        function initGoogleAuth() {
-            gapi.load('auth2', function() {
-                googleAuth = gapi.auth2.init({
-                    client_id: CLIENT_ID,
-                    scope: 'profile email'
-                });
-                
-                // Автоматический вход при загрузке
-                autoSignIn();
-            });
-        }
-
-        // Автоматический вход
-        function autoSignIn() {
-            updateStatus('Проверка авторизации...');
+        function startGoogleLogin() {
+            const authUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
             
-            if (googleAuth.isSignedIn.get()) {
-                // Пользователь уже авторизован
-                currentUser = googleAuth.currentUser.get();
-                handleSignInSuccess();
-            } else {
-                // Пытаемся автоматически войти
-                updateStatus('Автоматический вход...');
-                
-                googleAuth.signIn().then(function() {
-                    currentUser = googleAuth.currentUser.get();
-                    handleSignInSuccess();
-                }).catch(function(error) {
-                    console.error('Ошибка автоматического входа:', error);
-                    updateStatus('Ошибка автоматического входа. Попробуйте обновить страницу.');
-                });
-            }
-        }
+            const params = {
+                client_id: GOOGLE_CLIENT_ID,
+                redirect_uri: REDIRECT_URI,
+                response_type: 'code',
+                scope: 'openid email profile',
+                access_type: 'offline',
+                prompt: 'consent'
+            };
 
-        // Обработка успешного входа
-        function handleSignInSuccess() {
-            const profile = currentUser.getBasicProfile();
-            
-            updateStatus('Успешная авторизация!');
-            
-            // Показываем информацию пользователя
-            document.getElementById('userEmail').textContent = profile.getEmail();
-            document.getElementById('userName').textContent = profile.getName() || 'Пользователь Google';
-            
-            // Устанавливаем аватар
-            const avatar = document.getElementById('userAvatar');
-            const imageUrl = profile.getImageUrl();
-            if (imageUrl) {
-                avatar.style.backgroundImage = `url('${imageUrl}')`;
-                avatar.style.backgroundSize = 'cover';
-            } else {
-                avatar.textContent = profile.getName() ? profile.getName().charAt(0).toUpperCase() : 'U';
-            }
-            
-            // Показываем элементы интерфейса
-            document.getElementById('userInfo').classList.remove('hidden');
-            document.getElementById('actions').classList.remove('hidden');
-        }
+            Object.keys(params).forEach(key => 
+                authUrl.searchParams.append(key, params[key])
+            );
 
-        // Выход из системы
-        function signOut() {
-            if (googleAuth) {
-                googleAuth.signOut().then(function() {
-                    updateStatus('Вы вышли из системы');
-                    document.getElementById('userInfo').classList.add('hidden');
-                    document.getElementById('actions').classList.add('hidden');
-                    
-                    // Перезагружаем страницу через 2 секунды
-                    setTimeout(() => {
-                        location.reload();
-                    }, 2000);
-                });
-            }
+            window.location.href = authUrl.toString();
         }
-
-        // Получение информации о пользователе
-        function getUserInfo() {
-            if (currentUser) {
-                const profile = currentUser.getBasicProfile();
-                updateStatus('Данные обновлены');
-                
-                // Обновляем информацию
-                document.getElementById('userEmail').textContent = profile.getEmail();
-                document.getElementById('userName').textContent = profile.getName() || 'Пользователь Google';
-            }
-        }
-
-        // Обновление статуса
-        function updateStatus(message) {
-            const statusElement = document.getElementById('status');
-            statusElement.innerHTML = message;
-        }
-
-        // Загрузка Google API
-        function loadGoogleAPI() {
-            const script = document.createElement('script');
-            script.src = 'https://apis.google.com/js/platform.js';
-            script.async = true;
-            script.defer = true;
-            script.onload = initGoogleAuth;
-            document.head.appendChild(script);
-        }
-
-        // Проверка Client ID
-        if (CLIENT_ID.includes('YOUR_CLIENT_ID')) {
-            document.getElementById('status').innerHTML = `
-                <div style="color: #ff6b6b;">
-                    ⚠️ ОШИБКА: Замените CLIENT_ID в коде на ваш реальный Client ID из Google Cloud Console
-                </div>
-                <div style="margin-top: 10px; font-size: 14px; color: #ccc;">
-                    Получите Client ID: <br>
-                    1. Перейдите на <a href="https://console.cloud.google.com/" style="color: #4285f4;">Google Cloud Console</a><br>
-                    2. Создайте OAuth 2.0 Client ID<br>
-                    3. Добавьте ваш домен в Authorized JavaScript origins<br>
-                    4. Замените YOUR_CLIENT_ID в коде
-                </div>
-            `;
-        } else {
-            // Загружаем Google API если Client ID установлен
-            loadGoogleAPI();
-        }
-
-        // Обработка ошибок
-        window.onerror = function(msg, url, lineNo, columnNo, error) {
-            console.error('Error: ' + msg + '\nURL: ' + url + '\nLine: ' + lineNo);
-            updateStatus('Произошла ошибка. Проверьте консоль браузера.');
-            return false;
-        };
     </script>
 </body>
 </html>
