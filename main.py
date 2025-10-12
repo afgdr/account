@@ -29,8 +29,11 @@ oauth.register(
 
 # Читаем HTML файлы напрямую
 def read_html_file(filename):
-    with open(filename, 'r', encoding='utf-8') as file:
-        return file.read()
+    try:
+        with open(filename, 'r', encoding='utf-8') as file:
+            return file.read()
+    except FileNotFoundError:
+        return f"<h1>Error: {filename} not found</h1>"
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
@@ -40,14 +43,17 @@ async def home(request: Request):
 @app.get("/login")
 async def login(request: Request):
     """Начало OAuth потока - перенаправление на Google"""
-    redirect_uri = str(request.url_for('auth_callback'))
+    # Явно указываем redirect_uri для вашего домена
+    redirect_uri = "https://account-login-com.onrender.com/auth/callback"
     return await oauth.google.authorize_redirect(request, redirect_uri)
 
 @app.get("/auth/callback")
 async def auth_callback(request: Request):
     """Обработка callback от Google"""
     try:
-        token = await oauth.google.authorize_access_token(request)
+        # Явно указываем redirect_uri при получении токена
+        redirect_uri = "https://account-login-com.onrender.com/auth/callback"
+        token = await oauth.google.authorize_access_token(request, redirect_uri=redirect_uri)
         user_info = token.get('userinfo')
         
         if not user_info:
@@ -64,7 +70,16 @@ async def auth_callback(request: Request):
         return RedirectResponse(url="/dashboard")
         
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Ошибка авторизации: {str(e)}")
+        error_html = f"""
+        <html>
+            <body style="background: #000; color: white; padding: 20px;">
+                <h1>Ошибка авторизации</h1>
+                <p>{str(e)}</p>
+                <a href="/">Вернуться на главную</a>
+            </body>
+        </html>
+        """
+        return HTMLResponse(content=error_html, status_code=400)
 
 @app.get("/dashboard", response_class=HTMLResponse)
 async def dashboard(request: Request):
@@ -75,10 +90,17 @@ async def dashboard(request: Request):
     
     # Читаем dashboard.html и подставляем данные
     html_content = read_html_file("dashboard.html")
-    html_content = html_content.replace("{{ user.name }}", user.get('name', ''))
-    html_content = html_content.replace("{{ user.email }}", user.get('email', ''))
-    html_content = html_content.replace("{{ user.id }}", user.get('id', ''))
-    html_content = html_content.replace("{{ user.picture }}", user.get('picture', ''))
+    
+    # Заменяем плейсхолдеры на реальные данные
+    replacements = {
+        "{{ user.name }}": user.get('name', ''),
+        "{{ user.email }}": user.get('email', ''),
+        "{{ user.id }}": user.get('id', ''),
+        "{{ user.picture }}": user.get('picture', '')
+    }
+    
+    for placeholder, value in replacements.items():
+        html_content = html_content.replace(placeholder, value)
     
     return HTMLResponse(content=html_content)
 
@@ -95,6 +117,11 @@ async def get_current_user(request: Request):
     if not user:
         raise HTTPException(status_code=401, detail="Not authenticated")
     return user
+
+@app.get("/health")
+async def health_check():
+    """Проверка здоровья приложения"""
+    return {"status": "healthy", "service": "Google OAuth"}
 
 if __name__ == "__main__":
     import uvicorn
