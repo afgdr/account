@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Обработка входа</title>
+    <style>
+        body {
+            background: #000;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="status">Обработка входа...</div>
+
+    <script>
+        async function handleCallback() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+            const error = urlParams.get('error');
+
+            if (error) {
+                document.getElementById('status').textContent = 
+                    'Ошибка авторизации: ' + error;
+                return;
+            }
+
+            if (code) {
+                try {
+                    // Здесь нужно отправить code на ваш сервер
+                    // для обмена на access token
+                    document.getElementById('status').textContent = 
+                        'Успешный вход! Перенаправление...';
+                    
+                    // Перенаправление на главную страницу
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 2000);
+                    
+                } catch (err) {
+                    document.getElementById('status').textContent = 
+                        'Ошибка: ' + err.message;
+                }
+            }
+        }
+
+        handleCallback();
+    </script>
+</body>
+</html>
