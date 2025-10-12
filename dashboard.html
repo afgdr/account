@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель управления - FastAPI</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="dashboard-card">
+            <div class="user-header">
+                {% if user.picture %}
+                <img src="{{ user.picture }}" alt="Avatar" class="user-avatar">
+                {% endif %}
+                <div class="user-greeting">
+                    <h1>Добро пожаловать! 🎉</h1>
+                    <h2>{{ user.name }}</h2>
+                </div>
+            </div>
+            
+            <div class="user-info">
+                <div class="info-item">
+                    <strong>🆔 ID:</strong> 
+                    <code>{{ user.id }}</code>
+                </div>
+                <div class="info-item">
+                    <strong>📧 Email:</strong> 
+                    <span>{{ user.email }}</span>
+                    {% if user.email_verified %}
+                    <span class="verified">✓ Подтвержден</span>
+                    {% endif %}
+                </div>
+                <div class="info-item">
+                    <strong>👤 Имя:</strong> 
+                    <span>{{ user.name }}</span>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="btn-primary" onclick="checkAPI()">📡 Проверить API</button>
+                <button class="btn-secondary" onclick="window.location.href='/logout'">
+                    🚪 Выйти
+                </button>
+            </div>
+
+            <div id="api-result" class="api-result"></div>
+        </div>
+    </div>
+
+    <script>
+        async function checkAPI() {
+            try {
+                const response = await fetch('/api/user');
+                const data = await response.json();
+                
+                const resultDiv = document.getElementById('api-result');
+                resultDiv.innerHTML = `
+                    <div class="api-success">
+                        <h4>✅ Данные из API:</h4>
+                        <pre><code>${JSON.stringify(data, null, 2)}</code></pre>
+                    </div>
+                `;
+            } catch (error) {
+                const resultDiv = document.getElementById('api-result');
+                resultDiv.innerHTML = `
+                    <div class="api-error">
+                        <h4>❌ Ошибка API:</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
